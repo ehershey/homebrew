@@ -25,15 +25,8 @@ class Mongodb < Formula
   end
 
   devel do
-    url "https://fastdl.mongodb.org/src/mongodb-src-r2.7.7.tar.gz"
-    sha1 "ce223f5793bdf5b3e1420b0ede2f2403e9f94e5a"
-
-    # Remove this with the next devel release. Already merged in HEAD.
-    # https://github.com/mongodb/mongo/commit/8b8e90fb
-    patch do
-      url "https://github.com/mongodb/mongo/commit/8b8e90fb.diff"
-      sha1 "9f9ce609c7692930976690cae68aa4fce1f8bca3"
-    end
+    url "https://fastdl.mongodb.org/src/mongodb-src-r2.7.8.tar.gz"
+    sha1 "58bc953e4492fa70254f0b63a3ab64a99f51aa32"
   end
 
   # HEAD is currently failing. See https://jira.mongodb.org/browse/SERVER-15555

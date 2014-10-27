@@ -1,4 +1,5 @@
 require "formula"
+require "language/go"
 
 class Mongodb < Formula
   homepage "https://www.mongodb.org/"
@@ -37,8 +38,17 @@ class Mongodb < Formula
     end
   end
 
-  # HEAD is currently failing. See https://jira.mongodb.org/browse/SERVER-15555
-  head "https://github.com/mongodb/mongo.git"
+  # Mongo HEAD now requires mongo-tools, and Golang
+  # https://jira.mongodb.org/browse/SERVER-15806
+  head do
+    url "https://github.com/mongodb/mongo.git"
+
+    depends_on "go" => :build
+
+    go_resource "github.com/mongodb/mongo-tools" do
+      url "https://github.com/mongodb/mongo-tools.git", :tag => "2.7.8"
+    end
+  end
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
 
@@ -57,6 +67,25 @@ class Mongodb < Formula
   end
 
   def install
+
+    if build.head?
+      Language::Go.stage_deps resources, buildpath/"src"
+      ENV["GOPATH"] = buildpath
+
+      cd "src/github.com/mongodb/mongo-tools" do
+       system "./gpm", "install"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/bsondump/main/bsondump.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongostat/main/mongostat.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongofiles/main/mongofiles.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongoexport/main/mongoexport.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongoimport/main/mongoimport.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongorestore/main/mongorestore.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongodump/main/mongodump.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongotop/main/mongotop.go"
+       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongooplog/main/mongooplog.go"
+      end
+    end
+
     args = %W[
       --prefix=#{prefix}
       -j#{ENV.make_jobs}

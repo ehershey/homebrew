@@ -56,7 +56,27 @@ class Mongodb < Formula
     end
   end
 
+  resource "mongotools" do
+      url "https://github.com/mongodb/mongo-tools/archive/2.7.8.tar.gz"
+      sha1 "1f2232c7bdc8af9e35e6c293c49021ba785944c9"
+  end
+
   def install
+
+    # Build tools
+    #
+    unless build.stable?
+      resource("mongotools").stage do
+        # system ". ./set_gopath.sh"
+        tools = %w[bsondump mongostat mongofiles mongoexport mongoimport mongorestore mongodump mongotop mongooplog]
+        tools.each do |tool|
+          system ". ./set_gopath.sh ; go build  -o #{buildpath}/src/mongo-tools/#{tool} #{tool}/main/#{tool}.go"
+        end
+      end
+    end
+
+    # Build everything else
+    #
     args = %W[
       --prefix=#{prefix}
       -j#{ENV.make_jobs}
@@ -74,7 +94,6 @@ class Mongodb < Formula
     if build.with? "openssl"
       args << "--ssl" << "--extrapath=#{Formula["openssl"].opt_prefix}"
     end
-
     scons "install", *args
 
     (buildpath+"mongod.conf").write mongodb_conf

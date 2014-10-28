@@ -45,9 +45,10 @@ class Mongodb < Formula
 
     depends_on "go" => :build
 
-    go_resource "github.com/mongodb/mongo-tools" do
-      url "https://github.com/mongodb/mongo-tools.git", :tag => "2.7.8"
-    end
+  end
+
+  go_resource "github.com/mongodb/mongo-tools" do
+     url "https://github.com/mongodb/mongo-tools.git", :tag => "2.7.8"
   end
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
@@ -70,19 +71,18 @@ class Mongodb < Formula
 
     if build.head?
       Language::Go.stage_deps resources, buildpath/"src"
-      ENV["GOPATH"] = buildpath
+      ENV["GOPATH"] = "#{buildpath}:#{buildpath}/src/github.com/mongodb/mongo-tools/vendor"
 
       cd "src/github.com/mongodb/mongo-tools" do
-       system "./gpm", "install"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/bsondump/main/bsondump.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongostat/main/mongostat.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongofiles/main/mongofiles.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongoexport/main/mongoexport.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongoimport/main/mongoimport.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongorestore/main/mongorestore.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongodump/main/mongodump.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongotop/main/mongotop.go"
-       system "go", "build", "-o", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongooplog/main/mongooplog.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/bsondump", "#{buildpath}/src/github.com/mongodb/mongo-tools/bsondump/main/bsondump.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongostat", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongostat/main/mongostat.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongofiles", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongofiles/main/mongofiles.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongoexport", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongoexport/main/mongoexport.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongoimport", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongoimport/main/mongoimport.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongorestore", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongorestore/main/mongorestore.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongodump", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongodump/main/mongodump.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongotop", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongotop/main/mongotop.go"
+       system "go", "build", "-o", "#{buildpath}/src/mongo-tools/mongooplog", "#{buildpath}/src/github.com/mongodb/mongo-tools/mongooplog/main/mongooplog.go"
       end
     end
 
